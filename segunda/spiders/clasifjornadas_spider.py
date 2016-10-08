@@ -15,7 +15,7 @@ cEnd = '</Celda>'
 # Posiciones donde encontramos los puntos en la tabla de clasificación
 points = [0, 7, 14]
 
-#current fixture to grab
+# Jornada a coger. Lo cambiaremos luego cuando procesemos la clasificación.
 fixture = 1
 
 
@@ -32,6 +32,8 @@ class clasification(scrapy.Spider):
         urls = ['http://www.muntanercomunicacio.com/segundadivision/mockup-clasif.html',
                 'http://www.muntanercomunicacio.com/segundadivision/mockup-jornadas.html']
         
+        # El atributo "priority" hace estas llamadas "síncronas". Es necesario, dado que
+        # el XML he de generarlo secuencialmente, primero una URL, luego la otra.
         yield scrapy.Request(urls[0], callback=self.parseClasif, priority=1)
         yield scrapy.Request(urls[1], callback=self.parseSched)
     
@@ -67,6 +69,9 @@ class clasification(scrapy.Spider):
     def parseSched(self, page):
         print('Jornada: '+ str(fixture))
         schedule = page.css('.cont-modulo.resultados')
+        
+        # Abrimos el archivo en modo append, para escribir después de procesar la clasificación
+        # (es por esto que tenemos que hacer las llamadas secuencialmente)
         with open('xml.xml', 'a', encoding='utf-8') as xml:
             xml.write('ESTO DEBE IR DESPUES DE LA TABLA')
             
