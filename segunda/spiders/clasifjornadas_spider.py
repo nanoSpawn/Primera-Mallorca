@@ -143,10 +143,11 @@ class clasification(scrapy.Spider):
             schedXML += end
             
         schedXML += '</Root>'
+            
         # Abrimos el archivo en modo append, para escribir después de procesar la clasificación
         # (es por esto que tenemos que hacer las llamadas secuencialmente)
         with open('xml.xml', 'a', encoding='utf-8') as xml:
-            xml.write('ESTO DEBE IR DESPUES DE LA TABLA')
+            print('Escribimos el archivo. Todo correcto!')
             xml.write(schedXML)
             
     
