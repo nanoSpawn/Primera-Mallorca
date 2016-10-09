@@ -58,8 +58,10 @@ class clasification(scrapy.Spider):
     
     #Creamos dos callbacks diferentes para procesar cada página
     def start_requests(self):
-        urls = ['http://www.muntanercomunicacio.com/segundadivision/mockup-clasif.html',
-                'http://www.muntanercomunicacio.com/segundadivision/mockup-jornadas.html']
+        #urls = ['http://www.muntanercomunicacio.com/segundadivision/mockup-clasif.html',
+        #        'http://www.muntanercomunicacio.com/segundadivision/mockup-jornadas.html']
+        urls = ['http://resultados.as.com/resultados/futbol/segunda/clasificacion',
+                'http://resultados.as.com/resultados/futbol/segunda/calendario']
         
         # El atributo "priority" hace estas llamadas "síncronas". Es necesario, dado que
         # el XML he de generarlo secuencialmente, primero una URL, luego la otra.
@@ -93,6 +95,7 @@ class clasification(scrapy.Spider):
                     pointsXML += cStart + '<num>' + num + '</num>' + cEnd
             
         with open('xml.xml', 'w', encoding='utf-8') as xml:
+            print('Escribimos la clasificación procesada')
             xml.write(startTableXML + pointsXML + endTableXML)
             
             
