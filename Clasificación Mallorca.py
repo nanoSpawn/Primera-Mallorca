@@ -1,18 +1,25 @@
+#!/usr/bin/python3
+
 # Direcciones desde las que cogemos las cosas. La idea es generar un único XML
 # Este contendrá primero la clasificación, y luego las 2 jornadas.
 # http://resultados.as.com/resultados/futbol/segunda/clasificacion
 # http://resultados.as.com/resultados/futbol/segunda/calendario
 
-# Usamos la librería Scrapy para coger las Webs y parsearlas.
+# Usamos la librería Scrapy 1.2 para coger las Webs y parsearlas.
 import re
 import scrapy
+
+# Hacemos el script totalmente standalone, sin necesidad de crear el árbol de directorios de Scrapy.
 from scrapy.crawler import CrawlerProcess
 
 # Algunas variables globales
-startTableXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Root><Clasificacion><Tabla>'
+xmlFileName = 'clasificacion_jornadas.xml'
+tableParams = ''
+tableParams = ' xmlns:aid="http://ns.adobe.com/AdobeInDesign/4.0/" aid:table="table" aid:trows="24" aid:tcols="23"'
+startTableXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Root><Clasificacion><Tabla' + tableParams + '>'
 endTableXML = '</Tabla></Clasificacion>\n'
-#cellParams = ' aid:table="cell" aid:crows="1" aid:ccols="1"'
 cellParams = ''
+cellParams = ' aid:table="cell" aid:crows="1" aid:ccols="1"'
 cStart = '<Celda' + cellParams + '>'
 cEnd = '</Celda>'
 # Posiciones donde encontramos los puntos en la tabla de clasificación
@@ -20,7 +27,7 @@ points = [0, 7, 14]
 
 #Variables para las jornadas
 schedXML = ''
-start = '<Jornada>\n'
+start = '<Jornada>'
 end = '</Jornada>\n'
 
 # Jornada a coger. Lo cambiaremos luego cuando procesemos la clasificación.
@@ -79,8 +86,8 @@ class clasification(scrapy.Spider):
         # Recorremos todas las filas de la tabla, las 22, necesitamos numerarlas
         for pos, row in enumerate(table.css('tr')):
             posString = str(pos+1)
-            position = '\n<posicion>' + posString + '</posicion>'
-            team = '<nombre>' + row.css('span.nombre-equipo::text').extract_first() + '</nombre>\n'
+            position = '\n<posicion' + cellParams + '>' + posString + '</posicion>'
+            team = cStart + '<nombre>' + row.css('span.nombre-equipo::text').extract_first() + '</nombre>' + cEnd +'\n'
             pointsXML += position+team
             
             vals = row.css('td::text').extract()
@@ -95,7 +102,7 @@ class clasification(scrapy.Spider):
                 else:
                     pointsXML += cStart + '<num>' + num + '</num>' + cEnd
             
-        with open('xml.xml', 'w', encoding='utf-8') as xml:
+        with open(xmlFileName, 'w', encoding='utf-8') as xml:
             print('Escribimos la clasificación procesada')
             xml.write(startTableXML + pointsXML + endTableXML)
             
@@ -126,20 +133,20 @@ class clasification(scrapy.Spider):
             
             for match in matches:
                 day = match.css('.resultado::text').extract_first().strip()[:1]
-                hour = '<hora>' + match.css('.resultado::text').extract_first().strip()[2:] + '</hora> \n'
+                hour = '<hora>' + match.css('.resultado::text').extract_first().strip()[2:] + '</hora>\n'
                 
                 if day == 'S':
-                    schedXML += '<sabado>' + day + '</sabado>'
+                    schedXML += '<sabado>' + day + '</sabado>\t'
                 elif day == 'D':
-                    schedXML += '<domingo>' + day + '</domingo>'
+                    schedXML += '<domingo>' + day + '</domingo>\t'
                 
                 teamhome = match.css('.nombre-equipo::text')[0].extract()
                 teamaway = match.css('.nombre-equipo::text')[1].extract()
                 
                 if teamhome == 'Mallorca' or teamaway == 'Mallorca':
-                    schedXML += '<partidoMallorca>' + teamhome + ' - ' + teamaway + '</partidoMallorca>'
+                    schedXML += '<partidoMallorca>' + teamhome + ' - ' + teamaway + '</partidoMallorca>\t'
                 else:
-                    schedXML += '<partido>' + teamhome + ' - ' + teamaway + '</partido>'
+                    schedXML += '<partido>' + teamhome + ' - ' + teamaway + '</partido>\t'
                                 
                 schedXML += hour
             schedXML += end
@@ -148,10 +155,11 @@ class clasification(scrapy.Spider):
             
         # Abrimos el archivo en modo append, para escribir después de procesar la clasificación
         # (es por esto que tenemos que hacer las llamadas secuencialmente)
-        with open('xml.xml', 'a', encoding='utf-8') as xml:
+        with open(xmlFileName, 'a', encoding='utf-8') as xml:
             print('Escribimos el archivo. Todo correcto!')
             xml.write(schedXML)
-            
+
+# Funciones necesarias para que este script sea standalone.            
 process = CrawlerProcess({
     'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
 })
