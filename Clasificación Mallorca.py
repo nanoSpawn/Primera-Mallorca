@@ -61,9 +61,6 @@ class clasification(scrapy.Spider):
     
     name = 'Clasificación'
     
-    #start_urls = ['http://resultados.as.com/resultados/futbol/segunda/clasificacion',
-    #              'http://resultados.as.com/resultados/futbol/segunda/calendario/']
-    
     #Creamos dos callbacks diferentes para procesar cada página
     def start_requests(self):
         #urls = ['http://www.muntanercomunicacio.com/segundadivision/mockup-clasif.html',
@@ -135,7 +132,9 @@ class clasification(scrapy.Spider):
                 day = match.css('.resultado::text').extract_first().strip()[:1]
                 hour = '<hora>' + match.css('.resultado::text').extract_first().strip()[2:] + '</hora>\n'
                 
-                if day == 'S':
+                if day == 'V':
+                    schedXML += '<viernes>' + day + '</viernes>\t'
+                elif day == 'S':
                     schedXML += '<sabado>' + day + '</sabado>\t'
                 elif day == 'D':
                     schedXML += '<domingo>' + day + '</domingo>\t'
