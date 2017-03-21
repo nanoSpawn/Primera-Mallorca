@@ -138,6 +138,8 @@ class clasification(scrapy.Spider):
                     schedXML += '<sabado>' + day + '</sabado>\t'
                 elif day == 'D':
                     schedXML += '<domingo>' + day + '</domingo>\t'
+                elif day == 'L':
+                    schedXML += '<lunes>' + day + '</lunes>\t'
                 
                 teamhome = match.css('.nombre-equipo::text')[0].extract()
                 teamaway = match.css('.nombre-equipo::text')[1].extract()
