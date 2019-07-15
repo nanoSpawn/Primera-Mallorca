@@ -140,6 +140,12 @@ class clasification(scrapy.Spider):
                     schedXML += '<domingo>' + day + '</domingo>\t'
                 elif day == 'L':
                     schedXML += '<lunes>' + day + '</lunes>\t'
+                elif day == 'M':
+                    schedXML += '<martes>' + day + '</martes>\t'
+                elif day == 'X':
+                    schedXML += '<miercoles>' + day + '</miercoles>\t' #Wednesday is on hold and might be changed. Don't know the shortcode yet.
+                elif day == 'J':
+                    schedXML += '<jueves>' + day + '</jueves>\t'
                 
                 teamhome = match.css('.nombre-equipo::text')[0].extract()
                 teamaway = match.css('.nombre-equipo::text')[1].extract()
