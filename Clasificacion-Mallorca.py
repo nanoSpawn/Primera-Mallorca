@@ -65,8 +65,8 @@ class clasification(scrapy.Spider):
     def start_requests(self):
         #urls = ['http://www.muntanercomunicacio.com/segundadivision/mockup-clasif.html',
         #        'http://www.muntanercomunicacio.com/segundadivision/mockup-jornadas.html']
-        urls = ['http://resultados.as.com/resultados/futbol/segunda/clasificacion',
-                'http://resultados.as.com/resultados/futbol/segunda/calendario']
+        urls = ['https://resultados.as.com/resultados/futbol/primera/clasificacion',
+                'http://resultados.as.com/resultados/futbol/primera/calendario']
         
         # El atributo "priority" hace estas llamadas "síncronas". Es necesario, dado que
         # el XML he de generarlo secuencialmente, primero una URL, luego la otra.
